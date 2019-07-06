@@ -1,0 +1,33 @@
+<%- include('parts/html_head') %></body>
+<title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">Id</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Birthday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(let v of sales){ %>
+                        <tr>
+                            <td><%= v.sales_id %></td>
+                            <td><%= v.name %></td>
+                            <td><%= v.birthday2 %></td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
