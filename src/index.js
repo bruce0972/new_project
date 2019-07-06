@@ -1,28 +1,15 @@
 const express = require('express');
 const fs = require('fs');
-const url = require('url');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const upload = multer({ dest: 'tmp_uploads/' });
 const session = require('express-session');
 const moment = require('moment-timezone');
-const mysql = require('mysql');
 const bluebird = require('bluebird');
 
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: 'root',
-    database: 'shopping_cart'
-})
+const db = require('../models/db_connection');
+const toRegister = require('../models/member_register');
 
-db.connect(err => {
-    if (err) {
-        console.log('Database connecting error');
-    } else {
-        console.log('Database connecting success');
-    }
-});
 bluebird.promisifyAll(db);
 
 const app = express();
@@ -68,10 +55,7 @@ app.post('/', (req, res) => {
         req.body.email,
         req.body.password
     ], (error, results) => {
-        console.log('201:', results);
         if (results[0]) {
-            console.log('202:', results[0]);
-            console.log('202:', req.body.email);
             req.session.loginEmail = req.body.email;
             req.session.loginName = results[0].name;
         } else {
@@ -104,45 +88,14 @@ app.post('/register', (req, res) => {
         create_date: onTime()
     };
 
-    let result = {};
-
-    return new Promise((resolve, reject) => {
-        // 尋找是否有重複的email
-        db.query('SELECT email FROM member WHERE email = ?', [req.body.regEmail], function (err, rows) {
-            // 若資料庫部分出現問題，則回傳給client端「伺服器錯誤，請稍後再試！」的結果。
-            if (err) {
-                console.log(err);
-                result.regStatus = false;
-                result.errInfo = "伺服器錯誤，請稍後在試！";
-                reject(result);
-                return;
-            }
-            // 如果有重複的email
-            if (rows.length >= 1) {
-                result.regStatus = false;
-                result.errInfo = "已有重複的Email。";
-                reject(result);
-            } else {
-                // 將資料寫入資料庫
-                db.query('INSERT INTO member SET ?', memberData, function (err, rows) {
-                    // 若資料庫部分出現問題，則回傳給client端「伺服器錯誤，請稍後再試！」的結果。
-                    if (err) {
-                        console.log(err);
-                        result.regStatus = false;
-                        result.errInfo = "伺服器錯誤，請稍後在試！";
-                        reject(result);
-                        return;
-                    } else {
-                        // 若寫入資料庫成功，則回傳給clinet端下：
-                        result.regStatus = true;
-                        result.registerMember = memberData; //待定
-                        resolve(result);
-                    }
-                })
-            }
-        })
-    })
-    res.render('login', data)
+    toRegister(memberData).then(result => {
+        console.log('register success');
+        console.log(result);
+        
+        res.render('register_success', result);
+    }, (err) => {
+        res.render('register', err);
+    });
 });
 
 app.get('/try-upload', (req, res) => {

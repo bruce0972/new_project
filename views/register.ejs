@@ -1,48 +1,57 @@
 <%- include('parts/html_head') %>
-<title>Document</title>
+<title>Register</title>
 
 </head>
 
 <body>
     <%- include('parts/navbar') %>
+
     <div class="container">
+        <% if(locals.regStatus){ %>
+        <div class="alert alert-danger" role="alert">
+            <%= locals.regStatus %>
+        </div>
+        <% } %>
         <form method="POST" action="/register">
+            <!-- 若註冊的email已存在，則會顯示錯誤，並將輸入的資料再次出現在輸入的欄位 -->
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="regName">姓名</label>
-                    <input type="text" class="form-control" id="regName" name="regName" placeholder="Name" required>
+                    <input type="text" class="form-control" id="regName" name="regName" placeholder="Name" value="<%= (locals.regStatus) ? registerMember.name : ''%>" required>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="regId">身份證字號</label>
-                    <input type="text" class="form-control" id="regId" name="regId" placeholder="A123456789">
+                    <input type="text" class="form-control" id="regId" name="regId" placeholder="A123456789" disabled>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="regBirthday">生日</label>
-                    <input type="date" class="form-control" id="regBirthday" name="regBirthday" placeholder="Birthday">
+                    <input type="date" class="form-control" id="regBirthday" name="regBirthday" placeholder="Birthday"
+                        disabled>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="regPhoneNumber">行動電話</label>
                     <input type="text" class="form-control" id="regPhoneNumber" name="regPhoneNumber"
-                        placeholder="0912-345-678">
+                        placeholder="0912-345-678" disabled>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="regEmail">信箱 / 帳號</label>
                     <input type="email" class="form-control" id="regEmail" name="regEmail" placeholder="Email"
-                        onblur="checkEmail()" required>
+                        onblur="checkEmail()" value="<%= (locals.regStatus) ? registerMember.email : ''%>" required>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="regPassword">密碼</label>
                     <input type="password" class="form-control" id="regPassword" name="regPassword"
-                        placeholder="Password" required>
+                        placeholder="Password" value="<%= (locals.regStatus) ? registerMember.password : ''%>" required>
                 </div>
             </div>
             <div class="form-group">
                 <label for="regAddress">地址</label>
-                <input type="text" class="form-control" id="regAddress" name="regAddress" placeholder="Address">
+                <input type="text" class="form-control" id="regAddress" name="regAddress" placeholder="Address"
+                    disabled>
             </div>
             <button type="submit" class="btn btn-primary">註冊</button>
         </form>
@@ -55,7 +64,7 @@
 
             if (result === false) {
                 alert("請輸入正確的Email格式。(如1234@email.com)")
-            } 
+            }
         };
     </script>
 </body>
