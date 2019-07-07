@@ -7,26 +7,34 @@
     <%- include('parts/navbar') %>
 
     <div class="container">
+        <% if(locals.revInfo){ %>
+        <div id="login_flashMsg" class="alert alert-success" role="alert">
+            修改成功
+        </div>
+        <% } %>
         <form method="POST" action="/member_info">
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="revName">姓名</label>
-                    <input type="text" class="form-control" id="revName" name="revName" placeholder="Name" value="<%= name %>" required>
+                    <input type="text" class="form-control" id="revName" name="revName" placeholder="Name"
+                        value="<%= name %>" required>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="regId">身份證字號</label>
-                    <input type="text" class="form-control" id="regId" name="regId" placeholder="A123456789" value="<%= id %>" disabled>
+                    <input type="text" class="form-control" id="regId" name="regId" placeholder="A123456789"
+                        value="<%= id %>" disabled>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-md-6">
                     <label for="regBirthday">生日</label>
                     <input type="date" class="form-control" id="regBirthday" name="regBirthday" placeholder="Birthday"
-                    value="<%= birthday %>" disabled>
+                        value="<%= birthday %>" disabled>
                 </div>
                 <div class="form-group col-md-6">
                     <label for="revPhoneNumber">行動電話</label>
-                    <input type="text" class="form-control" id="revPhoneNumber" name="revPhoneNumber" value="<%= phonenumber %>" disabled>
+                    <input type="text" class="form-control" id="revPhoneNumber" name="revPhoneNumber"
+                        value="<%= phonenumber %>" disabled>
                 </div>
             </div>
             <div class="form-row">
@@ -44,7 +52,7 @@
             <div class="form-group">
                 <label for="revAddress">地址</label>
                 <input type="text" class="form-control" id="revAddress" name="revAddress" placeholder="Address"
-                value="<%= address %>" disabled>
+                    value="<%= address %>" disabled>
             </div>
             <button type="submit" class="btn btn-primary">確認修改</button>
         </form>

@@ -91,6 +91,7 @@ app.post('/register', (req, res) => {
     });
 });
 
+//取得會員資料
 app.get('/member_info', (req, res) => {
     if (!!req.session.loginEmail === true) {
         db.queryAsync('SELECT * FROM member WHERE email = ?', req.session.loginEmail)
@@ -100,17 +101,25 @@ app.get('/member_info', (req, res) => {
     };
 });
 
+//修改會員資料 - 僅可修改名字
 app.post('/member_info', (req, res) => {
     db.queryAsync('UPDATE member SET name = ? WHERE email = ?', [req.body.revName, req.session.loginEmail])
     .then( results => {
         // console.log(results);
         if(results.affectedRows === 1){
-            console.log("success");
+        return db.queryAsync('SELECT * FROM member where email = ?', [req.session.loginEmail])
         }
     })
-     
-})
+    .then( results => {
+        // console.log(results);
+        res.locals.revInfo = true;
+        console.log(results[0]);
+        res.render('member_info', results[0]);
+    });
 
+});
+
+//無相對路徑時捕捉的middleware
 app.use((req, res) => {
     res.type('text/plain');
     res.status(404);
@@ -129,6 +138,7 @@ function checkEmail(email) {
     return result;
 };
 
+//當下時間捕捉，並轉換mysql格式
 const onTime = () => {
     const date = new Date();
     const mm = date.getMonth() + 1;
