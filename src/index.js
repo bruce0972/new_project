@@ -22,6 +22,15 @@ app.use(session({
     }
 }));
 
+app.use('/', (req, res, next)=>{
+    if(req.session.loginEmail){
+        res.locals.isLogined = !! req.session.loginEmail;
+        res.locals.loginEmail= req.session.loginEmail;
+        res.locals.loginName= req.session.loginName;
+    }
+    next();
+});
+
 //首頁
 app.get('/', (req, res) => {
     const data = {};
@@ -83,12 +92,24 @@ app.post('/register', (req, res) => {
 });
 
 app.get('/member_info', (req, res) => {
-    db.query('SELECT email FROM member WHERE email = ?', req.session.email, function (err, rows){
-
-    });
-    
-
+    if (!!req.session.loginEmail === true) {
+        db.queryAsync('SELECT * FROM member WHERE email = ?', req.session.loginEmail)
+            .then(results => {
+                res.render('member_info', results[0]);
+            })
+    };
 });
+
+app.post('/member_info', (req, res) => {
+    db.queryAsync('UPDATE member SET name = ? WHERE email = ?', [req.body.revName, req.session.loginEmail])
+    .then( results => {
+        // console.log(results);
+        if(results.affectedRows === 1){
+            console.log("success");
+        }
+    })
+     
+})
 
 app.use((req, res) => {
     res.type('text/plain');

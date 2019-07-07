@@ -6,7 +6,60 @@
 <body>
     <%- include('parts/navbar') %>
 
+    <div class="container">
+        <form method="POST" action="/member_info">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="revName">姓名</label>
+                    <input type="text" class="form-control" id="revName" name="revName" placeholder="Name" value="<%= name %>" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="regId">身份證字號</label>
+                    <input type="text" class="form-control" id="regId" name="regId" placeholder="A123456789" value="<%= id %>" disabled>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="regBirthday">生日</label>
+                    <input type="date" class="form-control" id="regBirthday" name="regBirthday" placeholder="Birthday"
+                    value="<%= birthday %>" disabled>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="revPhoneNumber">行動電話</label>
+                    <input type="text" class="form-control" id="revPhoneNumber" name="revPhoneNumber" value="<%= phonenumber %>" disabled>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="regEmail">信箱 / 帳號</label>
+                    <input type="email" class="form-control" id="regEmail" name="regEmail" placeholder="Email"
+                        onblur="checkEmail()" value="<%= email %>" required>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="revPassword">密碼</label>
+                    <input type="password" class="form-control" id="revPassword" name="revPassword"
+                        placeholder="Password" value="<%= password %>" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="revAddress">地址</label>
+                <input type="text" class="form-control" id="revAddress" name="revAddress" placeholder="Address"
+                value="<%= address %>" disabled>
+            </div>
+            <button type="submit" class="btn btn-primary">確認修改</button>
+        </form>
+    </div>
 
+    <script>
+        function checkEmail() {
+            const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            const result = re.test($('#regEmail').val());
+
+            if (result === false) {
+                alert("請輸入正確的Email格式。(如1234@email.com)")
+            }
+        };
+    </script>
 </body>
 
 </html>
