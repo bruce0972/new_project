@@ -1,10 +1,6 @@
 const express = require('express');
-const fs = require('fs');
 const bodyParser = require('body-parser');
-const multer = require('multer');
-const upload = multer({ dest: 'tmp_uploads/' });
 const session = require('express-session');
-const moment = require('moment-timezone');
 const bluebird = require('bluebird');
 
 const db = require('../models/db_connection');
@@ -25,15 +21,6 @@ app.use(session({
         maxAge: 1000 * 60 * 20 //=20mins session 有效時間
     }
 }));
-
-//進入server時都會先檢查是否為登入狀態(無論到哪個router)
-app.use('/', (req, res, next) => {
-    if (req.session.loginUser) {
-        res.locals.isLogined = !!req.session.loginUser;
-        res.locals.loginUser = req.session.loginUser;
-    };
-    next();
-});
 
 //首頁
 app.get('/', (req, res) => {
@@ -89,64 +76,18 @@ app.post('/register', (req, res) => {
     };
 
     toRegister(memberData).then(result => {
-        console.log('register success');
-        console.log(result);
-        
         res.render('register_success', result);
     }, (err) => {
         res.render('register', err);
     });
 });
 
-app.get('/try-upload', (req, res) => {
-    res.render('try-upload');
-});
+app.get('/member_info', (req, res) => {
+    db.query('SELECT email FROM member WHERE email = ?', req.session.email, function (err, rows){
 
-app.post('/try-upload', upload.single('avatar'), (req, res) => {
-    console.log(req.file);
-    if (req.file && req.file.originalname) {
-        if (/\.(jpg|jpeg|png)$/i.test(req.file.originalname)) {
-            fs.createReadStream(req.file.path)
-                .pipe(
-                    fs.createWriteStream('./public/img/' + req.file.originalname)
-                );
-            res.render('try-upload', {
-                result: true,
-                name: req.body.name,
-                avatar: '/img/' + req.file.originalname
-            });
-            // return;
-        }
-    }
-    res.render('try-upload', {
-        result: false,
-        name: '',
-        avatar: ''
     });
+    
 
-});
-
-app.get('/try-post-form', (req, res) => {
-    res.render('try-post-form');
-});
-
-app.post('/try-post-form', (req, res) => {
-    console.log(req.body);
-    res.render('try-post-form', req.body);
-});
-
-app.get('/sales3', (req, res) => {
-    var sql = "SELECT * FROM sales;";
-    db.query(sql, (error, results, fields) => {
-        if (error) throw error;
-        console.log(results, fields);
-        for (let v of results) {
-            v.birthday2 = moment(v.birthday).format('YYYY-MM-DD');
-        }
-        res.render('sales3', {
-            sales: results
-        });
-    });
 });
 
 app.use((req, res) => {
@@ -158,7 +99,6 @@ app.use((req, res) => {
 app.listen(5000, (req, res) => {
     console.log("Server running");
 });
-
 
 
 //下面是function定義

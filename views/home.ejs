@@ -6,7 +6,7 @@
 <body>
     <%- include('parts/navbar') %>
     <% if(locals.flashMsg){ %>
-    <div class="alert alert-danger" role="alert">
+    <div id="login_flashMsg" class="alert alert-danger" role="alert">
         <%= flashMsg %>
     </div>
     <% } %>
@@ -19,6 +19,6 @@
             <% } %>
         </div>
     </div>
-    </body>
+</body>
 
 </html>

@@ -9,7 +9,12 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                    <a id="home_link" class="nav-link" href="/">首頁 <span class="sr-only">(current)</span></a>
+                </li>
+
+                <li class="nav-item active">
+                    <a id="member_center_link" class="nav-link" href="javascript:toMemberCenter()">會員資料 <span
+                            class="sr-only">(current)</span></a>
                 </li>
 
                 <li class="nav-item dropdown">
@@ -29,14 +34,15 @@
             <ul class="navbar-nav">
                 <% if(locals.loginName){ %>
                 <li class="nav-item">
-                    <a class="nav-link">歡迎回來 <%= locals.loginName %></a>
+                    <a id="loginName_link" class="nav-link"><%= locals.loginName %></a>
                 </li>
-                    <a class="nav-link" href="/logout">登出</a>
+                <a class="nav-link" href="/logout">登出</a>
                 </li>
                 <% } else{ %>
                 <li class="nav-item">
                     <!-- Button trigger modal -->
-                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                    <button id="login_btn" type="button" class="btn btn-primary" data-toggle="modal"
+                        data-target="#exampleModal">
                         登入
                     </button>
                 </li>
@@ -45,9 +51,13 @@
             <!-- Login Modal -->
             <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
                 aria-hidden="true">
+
                 <div class="modal-dialog" role="document">
+
                     <div class="modal-content">
+                        
                         <form class="px-4 py-3" method="POST" action="/">
+
                             <div class="form-group">
                                 <label for="email">信箱 / 帳號</label>
                                 <input type="email" class="form-control" id="email" name="email"
@@ -66,14 +76,27 @@
                                     </label>
                                 </div>
                             </div>
+                           
                             <button type="submit" class="btn btn-primary">登入</button>
                         </form>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="/register">尚未加入? 立即註冊</a>
                         <a class="dropdown-item" href="#">忘記密碼？</a>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </nav>
+
+<script>
+    function toMemberCenter() {
+        if ($('#loginName_link').text().length !== 0) {
+            window.location.href = "/member_info";
+        } else {
+            $('#login_btn').click();
+        };
+    };
+
+</script>
