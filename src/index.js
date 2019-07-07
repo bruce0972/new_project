@@ -22,26 +22,41 @@ app.use(session({
     }
 }));
 
-app.use('/', (req, res, next)=>{
-    if(req.session.loginEmail){
-        res.locals.isLogined = !! req.session.loginEmail;
-        res.locals.loginEmail= req.session.loginEmail;
-        res.locals.loginName= req.session.loginName;
+app.use('/', (req, res, next) => {
+    if (req.session.loginEmail) {
+        res.locals.isLogined = !!req.session.loginEmail;
+        res.locals.loginEmail = req.session.loginEmail;
+        res.locals.loginName = req.session.loginName;
     }
     next();
 });
 
 //首頁
 app.get('/', (req, res) => {
-    const data = {};
-    if (req.session.flashMsg) {
-        data.flashMsg = req.session.flashMsg;
-        delete req.session.flashMsg;
-    };
-    data.isLogined = !!req.session.loginEmail;
-    data.loginEmail = req.session.loginEmail;
-    data.loginName = req.session.loginName;
-    res.render('home', data);
+    let data = {};
+    data.non_repeat_category = new Set();
+    let sql = "SELECT * FROM product;";
+
+    db.queryAsync(sql, (error, results) => {
+
+        //全部的products資料給data
+        data.products = results;
+
+        //不重複的商品種類，供種類篩選用
+        results.forEach( product => {
+            data.non_repeat_category.has(product.category) ? '' : data.non_repeat_category.add(product.category);
+        })
+
+        if (req.session.flashMsg) {
+            data.flashMsg = req.session.flashMsg;
+            delete req.session.flashMsg;
+        };
+
+        data.isLogined = !!req.session.loginEmail;
+        data.loginEmail = req.session.loginEmail;
+        data.loginName = req.session.loginName;
+        res.render('home', data);
+    })
 });
 
 //會員登入
@@ -104,18 +119,18 @@ app.get('/member_info', (req, res) => {
 //修改會員資料 - 僅可修改名字
 app.post('/member_info', (req, res) => {
     db.queryAsync('UPDATE member SET name = ? WHERE email = ?', [req.body.revName, req.session.loginEmail])
-    .then( results => {
-        // console.log(results);
-        if(results.affectedRows === 1){
-        return db.queryAsync('SELECT * FROM member where email = ?', [req.session.loginEmail])
-        }
-    })
-    .then( results => {
-        // console.log(results);
-        res.locals.revInfo = true;
-        console.log(results[0]);
-        res.render('member_info', results[0]);
-    });
+        .then(results => {
+            // console.log(results);
+            if (results.affectedRows === 1) {
+                return db.queryAsync('SELECT * FROM member where email = ?', [req.session.loginEmail])
+            }
+        })
+        .then(results => {
+            // console.log(results);
+            res.locals.revInfo = true;
+            console.log(results[0]);
+            res.render('member_info', results[0]);
+        });
 
 });
 

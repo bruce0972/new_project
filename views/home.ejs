@@ -4,19 +4,53 @@
 </head>
 
 <body>
+
     <%- include('parts/navbar') %>
-    <% if(locals.flashMsg){ %>
-    <div id="login_flashMsg" class="alert alert-danger" role="alert">
-        <%= flashMsg %>
-    </div>
-    <% } %>
-    <div class="row">
-        <div class="col-md-6">
-            <% if(locals.isLogined){ %>
-            <div class="alert alert-primary" role="alert">
-                <%= loginEmail %>您好<a href="/logout">登出</a>
+    <div class="container">
+        <% if(locals.flashMsg){ %>
+        <div id="login_flashMsg" class="alert alert-danger" role="alert">
+            <%= flashMsg %>
+        </div>
+        <% } %>
+        <div class="row">
+            <div class="col-md-6">
+                <% if(locals.isLogined){ %>
+                <div class="alert alert-primary" role="alert">
+                    <%= loginEmail %>您好<a href="/logout">登出</a>
+                </div>
+                <% } %>
             </div>
-            <% } %>
+        </div>
+        <div class="row">
+            <div class="col-3">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab"
+                        aria-controls="v-pills-home" aria-selected="true">總類</a>
+                    <% for(let category of non_repeat_category){ %>
+                    <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab"
+                        aria-controls="v-pills-profile" aria-selected="false"><%= category %></a>
+                    <% } %>
+                </div>
+            </div>
+            <div class="col-9">
+                <% for(let i in products){ %>
+                <div class="card mb-3" style="max-width: 850px;">
+                    <div class="row no-gutters">
+                        <div class="col-md-4">
+                            <img src="..." class="card-img" alt="...">
+                        </div>
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <h5 class="card-title"><%= products[i].name %></h5>
+                                <p class="card-text"><%= products[i].description %></p><span>網路價$
+                                    <%= products[i].price %> </span><button class="btn btn-primary btn-sm">購買</button>
+                                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
         </div>
     </div>
 </body>
