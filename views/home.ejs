@@ -13,15 +13,6 @@
         </div>
         <% } %>
         <div class="row">
-            <div class="col-md-6">
-                <% if(locals.isLogined){ %>
-                <div class="alert alert-primary" role="alert">
-                    <%= loginEmail %>您好<a href="/logout">登出</a>
-                </div>
-                <% } %>
-            </div>
-        </div>
-        <div class="row">
             <div class="col-3">
                 <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                     <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab"
@@ -34,17 +25,19 @@
             </div>
             <div class="col-9">
                 <% for(let i in products){ %>
-                <div class="card mb-3" style="max-width: 850px;">
+                <div class="card mb-3 card-product" style="max-width: 850px;">
                     <div class="row no-gutters">
                         <div class="col-md-4">
-                            <img src="..." class="card-img" alt="...">
+                            <img src="" class="card-img" alt="...">
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
                                 <h5 class="card-title"><%= products[i].name %></h5>
-                                <p class="card-text"><%= products[i].description %></p><span>網路價$
-                                    <%= products[i].price %> </span><button class="btn btn-primary btn-sm">購買</button>
-                                <p class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p>
+                                <p class="card-text"><%= products[i].description %></p>
+                                <span>網路價$ </span>
+                                <span><%= products[i].price %> </span><button id="<%= products[i].id %>"
+                                    name="<%= products[i].id %>" class="btn btn-primary btn-sm btn-purchase">購買</button>
+                                <!-- <small class="card-text"><small class="text-muted">Last updated 3 mins ago</small></p> -->
                             </div>
                         </div>
                     </div>
@@ -53,6 +46,62 @@
             </div>
         </div>
     </div>
+
+    <script>
+        var btnId = 0;
+        var productId = 0;
+        var productName;
+        var productUnitPrice = 0;
+        var productQty = 0;
+        // var productPrice = 0;
+        var item_qty = 0;
+        var item_amount = 0;
+        var shopping_cart = new Map(); //僅供首頁購物車顯示金額而已
+        var shopping_cart_id_list = []; //傳送後台的id清單
+        var shopping_cart_name_list = [];
+        var shopping_cart_qty_list = []; //傳送後台的qty清單
+        var shopping_cart_unit_price_list = [];
+        
+
+        $('button.btn-purchase').click(function () {
+            btnId = this.id - 1; //按鈕編號
+            productId = this.id; //商品編號
+            productQty = 1; //之後再改動態
+            productUnitPrice = parseInt($('.card-product').eq(btnId).find('span').last().text()); //商品單價
+            productName = $('.card-product').eq(btnId).find('h5').text();
+
+
+            if (!shopping_cart.has(productId)) {
+                shopping_cart.set(productId, productQty); //加入不重複物件productId
+
+                item_qty++; //件數
+                item_amount += productUnitPrice; //累計金額
+                $('#shopping_cart_amount').text(item_amount); //將金額導入購物車
+
+                shopping_cart_id_list.push(productId);
+                shopping_cart_name_list.push(productName);
+                shopping_cart_qty_list.push(productQty);
+                shopping_cart_unit_price_list.push(productUnitPrice);
+            }
+            // console.log("item_qty: " + item_qty);
+            // console.log("item_amount: " + item_amount)
+            // console.log(shopping_cart);
+
+            console.log(shopping_cart_id_list);
+            console.log(shopping_cart_name_list);
+            console.log(shopping_cart_qty_list);
+            console.log(shopping_cart_unit_price_list);
+
+            $('#shopping_cart_id').val(shopping_cart_id_list);
+            $('#shopping_cart_name').val(shopping_cart_name_list);
+            $('#shopping_cart_qty').val(shopping_cart_qty_list);
+            $('#shopping_cart_unit_price').val(shopping_cart_unit_price_list);
+        })
+    </script>
 </body>
 
 </html>
+<!-- 
+results.forEach( product => {
+    data.non_repeat_category.has(product.category) ? '' : data.non_repeat_category.add(product.category);
+}) -->

@@ -1,0 +1,50 @@
+<%- include('parts/html_head') %></body>
+<title>Shopping_Cart</title>
+
+</head>
+
+<body>
+    <%- include('parts/navbar') %>
+    <div class="container">
+
+        <table class="table table-bordered table-striped table-hover text-center">
+            <thead>
+                <tr class="table-primary">
+                    <th scope="col" style="display: none">產品編號</th>
+                    <th scope="col">商品</th>
+                    <th scope="col">數量</th>
+                    <th scope="col">單價</th>
+                    <th scope="col">小計</th>
+                    <th scope="col">取消</th>
+
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let i = 0; i < productId.length; i++){ %>
+                <tr>
+                    <td style="display: none"><%= productId[i] %></td>
+                    <td class="product_name"><%= productName[i] %></td>
+                    <td><%= productQty[i] %></td>
+                    <td><span>$ </span><%= productUnitPrice[i] %></td>
+                    <td><span>$ </span><%= productQty[i] * productUnitPrice[i] %></td>
+                    <!-- <td><a class="cancle_link" href="javascript:hi()"><i class="fas fa-trash-alt"></i></a></td> -->
+                    <td><button class="cancle_btn"  onclick="delete_one()"><i class="fas fa-trash-alt"></i></button></td>
+                </tr>
+                <% } %>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+            $('button.cancle_btn').click(function () {
+                let selected_product_name = $(this).parent().siblings('td').eq(1).text();
+                if (confirm(`是否要取消"${selected_product_name}"的資料?`)) {
+                    $(this).parent().parent().remove();
+                }
+            })
+    </script>
+
+</body>
+
+</html>

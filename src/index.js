@@ -134,6 +134,24 @@ app.post('/member_info', (req, res) => {
 
 });
 
+//
+app.post('/shopping_cart', (req, res) => {
+    // console.log("進入shopping_cart --- post");
+    let productId = req.body.shopping_cart_id.split(",");
+    let productName = req.body.shopping_cart_name.split(",");
+    let productQty = req.body.shopping_cart_qty.split(",");
+    let productUnitPrice = req.body.shopping_cart_unit_price.split(",")
+
+    let data = {};
+
+    data.productId = productId;
+    data.productName = productName;
+    data.productQty = productQty;
+    data.productUnitPrice = productUnitPrice;
+    
+    res.render('shopping_cart', data);
+});
+
 //無相對路徑時捕捉的middleware
 app.use((req, res) => {
     res.type('text/plain');

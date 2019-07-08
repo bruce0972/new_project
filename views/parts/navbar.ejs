@@ -17,17 +17,28 @@
                             class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item active">
-                        <a id="order_info_link" class="nav-link" href="#">訂單資料 <span
-                                class="sr-only">(current)</span></a>
-                    </li>
+                    <a id="order_info_link" class="nav-link" href="#">訂單資料 <span class="sr-only">(current)</span></a>
+                </li>
 
             </ul>
             <ul class="navbar-nav">
+                <!-- shopping cart -->
+                <li class="nav-item">
+                    <form id="shopping_form" action="/shopping_cart" method="POST" style="display:none">
+                        <input type="text" id="shopping_cart_id" name="shopping_cart_id" value="">
+                        <input type="text" id="shopping_cart_name" name="shopping_cart_name" value="">
+                        <input type="text" id="shopping_cart_qty" name="shopping_cart_qty" value="">
+                        <input type="text" id="shopping_cart_unit_price" name="shopping_cart_unit_price" value="">
+                    </form>
+                    <a class="nav-link" id="shopping_cart" name="shopping_cart" href="javascript:$('#shopping_form').submit()"><i  class="fas fa-shopping-cart"></i>
+                        <span>$ </span><span id="shopping_cart_amount" name="shopping_cart_amount"></span></a>
+                </li>
                 <% if(locals.loginName){ %>
                 <li class="nav-item">
                     <a id="loginName_link" class="nav-link"><%= locals.loginName %></a>
                 </li>
-                <a class="btn btn-primary" href="/logout">登出</a>
+                <li>
+                    <a class="btn btn-primary" href="/logout">登出</a>
                 </li>
                 <% } else{ %>
                 <li class="nav-item">
@@ -46,7 +57,7 @@
                 <div class="modal-dialog" role="document">
 
                     <div class="modal-content">
-                        
+
                         <form class="px-4 py-3" method="POST" action="/">
 
                             <div class="form-group">
@@ -67,7 +78,7 @@
                                     </label>
                                 </div>
                             </div>
-                           
+
                             <button type="submit" class="btn btn-primary">登入</button>
                         </form>
                         <div class="dropdown-divider"></div>
