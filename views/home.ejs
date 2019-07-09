@@ -67,34 +67,48 @@
 
 
         $('button.btn-purchase').click(function () {
-            btnId = this.id - 1; //按鈕編號
-            productId = this.id; //商品編號
-            productQty = 1; //之後再改動態
-            productUnitPrice = parseInt($('.card-product').eq(btnId).find('span').last().text()); //商品單價
-            productName = $('.card-product').eq(btnId).find('h5').text();
-            productCategory = $('.product_category').eq(btnId).text();
+
+            if ($('#loginName_link').text().length !== 0) {
+
+                btnId = this.id - 1; //按鈕編號
+                productId = this.id; //商品編號
+                productQty = 1; //之後再改動態
+                productUnitPrice = parseInt($('.card-product').eq(btnId).find('span').last().text()); //商品單價
+                productName = $('.card-product').eq(btnId).find('h5').text();
+                productCategory = $('.product_category').eq(btnId).text();
 
 
-            if (!shopping_cart.has(productId)) {
-                shopping_cart.set(productId, productQty); //加入不重複物件productId
+                if (!shopping_cart.has(productId)) {
+                    shopping_cart.set(productId, productQty); //加入不重複物件productId
 
-                item_qty++; //件數
-                item_amount += productUnitPrice; //累計金額
-                $('#shopping_cart_amount').text(item_amount); //將金額導入購物車
+                    item_qty++; //件數
+                    item_amount += productUnitPrice; //累計金額
+                    // $('#shopping_cart_amount').text(item_amount); //將金額導入購物車
 
-                shopping_cart_id_list.push(productId);
-                shopping_cart_name_list.push(productName);
-                shopping_cart_qty_list.push(productQty);
-                shopping_cart_unit_price_list.push(productUnitPrice);
-                shopping_cart_category.push(productCategory);
-            }
+                    shopping_cart_id_list.push(productId);
+                    shopping_cart_name_list.push(productName);
+                    shopping_cart_qty_list.push(productQty);
+                    shopping_cart_unit_price_list.push(productUnitPrice);
+                    shopping_cart_category.push(productCategory);
+                }
 
-            $('#shopping_cart_id').val(shopping_cart_id_list);
-            $('#shopping_cart_name').val(shopping_cart_name_list);
-            $('#shopping_cart_qty').val(shopping_cart_qty_list);
-            $('#shopping_cart_unit_price').val(shopping_cart_unit_price_list);
-            $('#shopping_cart_category').val(shopping_cart_category);
-        })
+                $('#shopping_cart_id').val(shopping_cart_id_list);
+                $('#shopping_cart_name').val(shopping_cart_name_list);
+                $('#shopping_cart_qty').val(shopping_cart_qty_list);
+                $('#shopping_cart_unit_price').val(shopping_cart_unit_price_list);
+                $('#shopping_cart_category').val(shopping_cart_category);
+
+                $.post('/addToCart', $(document.forms[0]).serialize(), function (data) {
+                    let cart_amount = SumDataforEach(data.body.shopping_cart_unit_price.split(','))
+                    $('#shopping_cart_amount').text(cart_amount);
+
+                });
+                $('#shopping_cart_amount').text(0);
+
+            } else {
+                $('#login_btn').click();
+            };
+        });
 
         $('a.category_link').click(function () {
             let category = $(this).text();
@@ -111,6 +125,15 @@
         $('a.all_category').click(function () {
             $('div.card_container').children().show();
         })
+
+        function SumDataforEach(arr) {
+            var sum = 0;
+            arr.forEach(function (element) {
+                sum += parseInt(element);
+            });
+            return sum;
+        };
+
     </script>
 </body>
 

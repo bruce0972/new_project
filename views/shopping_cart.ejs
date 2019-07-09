@@ -67,6 +67,7 @@
             }
             shopping_cart_subtotal -= parseInt($(this).parent().siblings('td').eq(4).children('span.product_subtotal').text()); //小計扣除刪除的項目金額
             $('#subtotal').text(shopping_cart_subtotal);
+            $('#shopping_cart_amount').text(shopping_cart_subtotal);
         })
 
         function placeOrder() {

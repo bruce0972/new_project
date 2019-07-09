@@ -27,6 +27,13 @@ app.use('/', (req, res, next) => {
         res.locals.isLogined = !!req.session.loginEmail;
         res.locals.loginEmail = req.session.loginEmail;
         res.locals.loginName = req.session.loginName;
+
+        // res.locals.cart_temp_amount = req.session.cart_temp_amount; //留意這段
+        // res.locals.shopping_cart_id = req.session.shopping_cart_id
+        // res.locals.shopping_cart_name = req.session.shopping_cart_name
+        // res.locals.shopping_cart_qty = req.session.shopping_cart_qty
+        // res.locals.shopping_cart_unit_price = req.session.shopping_cart_unit_price
+        // console.log(req.session.cart_temp_amount)
     }
     next();
 });
@@ -134,13 +141,24 @@ app.post('/member_info', (req, res) => {
 
 });
 
+app.post('/addToCart', (req, res) => {
+    let data = {};
+    data.body = req.body;
+
+    req.session.shopping_cart_temp_amount = SumDataforEach(req.body.shopping_cart_unit_price.split(','));
+    res.json(data)
+})
+
 //轉入shopping_cart頁面
 app.post('/shopping_cart', (req, res) => {
     let productId = req.body.shopping_cart_id.split(",");
     let productName = req.body.shopping_cart_name.split(",");
     let productQty = req.body.shopping_cart_qty.split(",");
-    let productUnitPrice = req.body.shopping_cart_unit_price.split(",")
-    let productCategory = req.body.shopping_cart_category.split(",")
+    let productUnitPrice = req.body.shopping_cart_unit_price.split(",");
+    let productCategory = req.body.shopping_cart_category.split(",");
+    let cart_temp_amount = req.body.shopping_cart_temp_amount;
+    console.log("cart amount");
+    console.log(req.body.shopping_cart_temp_amount);
 
     let data = {};
 
@@ -149,6 +167,14 @@ app.post('/shopping_cart', (req, res) => {
     data.productQty = productQty;
     data.productUnitPrice = productUnitPrice;
     data.productCategory = productCategory;
+    data.cart_temp_amount = cart_temp_amount;
+
+    // req.session.shopping_cart_id = productId;
+    // req.session.shopping_cart_name = productName;
+    // req.session.shopping_cart_qty = productQty;
+    // req.session.shopping_cart_unit_price = productUnitPrice;
+    req.session.cart_temp_amount = cart_temp_amount; //測試
+    
 
     res.render('shopping_cart', data);
 });
@@ -243,3 +269,11 @@ const onTime = () => {
         (ss > 9 ? '' : '0') + ss
     ].join('');
 }
+
+function SumDataforEach(arr) {
+    var sum = 0;
+    arr.forEach(function (element) {
+        sum += parseInt(element);
+    });
+    return sum;
+};
