@@ -1,0 +1,42 @@
+<%- include('parts/html_head') %></body>
+<title>Order_Info</title>
+
+</head>
+
+<body>
+    <%- include('parts/navbar') %>
+    <div class="container">
+
+            <table class="table table-bordered table-striped table-hover text-center">
+                    <thead>
+                        <tr class="table-primary">
+                            <!-- <th scope="col" style="display: none">產品編號</th> -->
+                            <th scope="col">訂單編號</th>
+                            <th scope="col">商品</th>
+                            <th scope="col">數量</th>
+                            <th scope="col">單價</th>
+                            <th scope="col">小計</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <%# orderInfo[0].product_name %> 
+                        <% for(let i = orderInfo.length-1; i >= 0; i--){ %>
+                        <tr class="items">
+                            <td><%= orderInfo[i].order_id %></td>
+                            <td class="product_name"><%= orderInfo[i].product_name %></td>
+                            <td class="product_qty"><%= orderInfo[i].order_quantity %></td>
+                            <td><span>$ </span><%= orderInfo[i].order_price %></td>
+                            <td><span>$ </span><span class="product_subtotal"><%= orderInfo[i].order_quantity * orderInfo[i].order_price %></span></td>
+                        </tr>
+                        <% } %>
+                       
+        
+                    </tbody>
+                </table>
+    </div>
+<script>
+
+</script>
+</body>
+
+</html>

@@ -43,7 +43,7 @@ app.get('/', (req, res) => {
         data.products = results;
 
         //不重複的商品種類，供種類篩選用
-        results.forEach( product => {
+        results.forEach(product => {
             data.non_repeat_category.has(product.category) ? '' : data.non_repeat_category.add(product.category);
         })
 
@@ -67,6 +67,7 @@ app.post('/', (req, res) => {
         req.body.password
     ], (error, results) => {
         if (results[0]) {
+            req.session.member_id = results[0].member_id;
             req.session.loginEmail = req.body.email;
             req.session.loginName = results[0].name;
         } else {
@@ -148,23 +149,62 @@ app.post('/shopping_cart', (req, res) => {
     data.productName = productName;
     data.productQty = productQty;
     data.productUnitPrice = productUnitPrice;
-    
+
     res.render('shopping_cart', data);
 });
 
-app.post('/order', (req, res) => {
+app.get('/order_info', (req, res) => {
+    let order_Info = {};
+    let sql = `SELECT * FROM order_list WHERE member_id = ${req.session.member_id}`;
+    db.queryAsync(sql, (error, results) => {
+        order_Info.orderInfo = results;
+        // console.log(order_Info);
+        res.render('order_info', order_Info);
+    })
+});
+
+app.post('/place_order', (req, res) => {
     let productId = req.body.order_item_id.split(',');
     let productQty = req.body.order_item_qty.split(',');
+    let productSubtotal = req.body.order_item_subtotal.split(',');
+    let productName = req.body.order_item_name.split(',');
+    let temp_max_order_id = 0;
+    let new_order = {};
 
-    for(let i = 0; i < req.body.order_item_id.length ; i++){
-        let sql_Updata = `UPDATE product SET product.quantity = product.quantity - ${productQty[i]} WHERE product.id = ${productId[i]};`;
-        db.queryAsync(sql_Updata, function(error, results){
-            console.log("扣帳成功");
-        })
+    if (!req.session.loginEmail) {
+        res.redirect('/'); //必須先登入
     }
 
-    let sql_Insert = `INSERT INTO order_list`
-    
+    //個別產品數量扣除
+    for (let i = 0; i < productId.length; i++) {
+        let sql_Updata = `UPDATE product SET product.quantity = product.quantity - ${productQty[i]} WHERE product.id = ${productId[i]};`;
+        db.query(sql_Updata);
+    }
+
+    //導出訂單編號
+    let sql_Select = `SELECT order_id from order_list ORDER BY order_id DESC LIMIT 1;`;
+    db.queryAsync(sql_Select)
+        .then(results => {
+            temp_max_order_id = results[0].order_id + 1;
+            return db.queryAsync(`SELECT * FROM member where email = ?`, [req.session.loginEmail])
+                .then(results => {
+                    // new_order.memberid = results[0].member_id;
+                    // new_order.member_email = results[0].email;
+                    let sql_Insert = `INSERT INTO order_list (order_id, member_id, product_id, product_name, order_quantity, order_price, order_date) VALUES (?, ?, ?, ?, ?, ?, ?);`;
+                    for (let i = 0; i < productId.length; i++) {
+                        db.queryAsync(sql_Insert, [temp_max_order_id, results[0].member_id, productId[i], productName[i], productQty[i], productSubtotal[i], onTime()])
+                    }
+                    let sql_Select_orderlist = `SELECT * FROM order_list WHERE member_id = ${results[0].member_id};`;
+                    return db.queryAsync(sql_Select_orderlist)
+                })
+                .then(results => {
+                    new_order.orderInfo = results
+                    console.log(new_order);
+                    res.render('order_info', new_order);
+                })
+        })
+
+
 });
 
 //無相對路徑時捕捉的middleware

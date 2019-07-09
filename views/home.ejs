@@ -18,17 +18,17 @@
                     <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab"
                         aria-controls="v-pills-home" aria-selected="true">總類</a>
                     <% for(let category of non_repeat_category){ %>
-                    <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab"
+                    <a class="nav-link category_link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab"
                         aria-controls="v-pills-profile" aria-selected="false"><%= category %></a>
                     <% } %>
                 </div>
             </div>
-            <div class="col-9">
+            <div class="col-9 card_container">
                 <% for(let i in products){ %>
                 <div class="card mb-3 card-product" style="max-width: 850px;">
                     <div class="row no-gutters">
                         <div class="col-md-4">
-                            <img src="" class="card-img" alt="...">
+                            <img src="/img/<%= products[i].id %>.jpg" class="card-img" alt="...">
                         </div>
                         <div class="col-md-8">
                             <div class="card-body">
@@ -83,25 +83,28 @@
                 shopping_cart_qty_list.push(productQty);
                 shopping_cart_unit_price_list.push(productUnitPrice);
             }
-            // console.log("item_qty: " + item_qty);
-            // console.log("item_amount: " + item_amount)
-            // console.log(shopping_cart);
-
-            console.log(shopping_cart_id_list);
-            console.log(shopping_cart_name_list);
-            console.log(shopping_cart_qty_list);
-            console.log(shopping_cart_unit_price_list);
 
             $('#shopping_cart_id').val(shopping_cart_id_list);
             $('#shopping_cart_name').val(shopping_cart_name_list);
             $('#shopping_cart_qty').val(shopping_cart_qty_list);
             $('#shopping_cart_unit_price').val(shopping_cart_unit_price_list);
         })
+
+        $('a.category_link').click(function(){
+            let category = $(this).text();
+            let product_number = $('div.card_container').children().length;
+            // $('div.card_container').children().hide();
+            // for(let i = 0; i < product_number; i++){
+            //     if($('div.card-container')[i].children('h5.card-title').text()=="樂事波樂洋芋片"){
+            //         $('div.card_container').show()
+            //     }
+            // }
+            // console.log($('div.card-container').eq(0).children('h5.card-title').eq(0).text())
+            console.log($('div.card_container').eq(0).children('h5.card-title').text())
+            // $('h5.card-title').eq(0).text();
+
+        })
     </script>
 </body>
 
 </html>
-<!-- 
-results.forEach( product => {
-    data.non_repeat_category.has(product.category) ? '' : data.non_repeat_category.add(product.category);
-}) -->
