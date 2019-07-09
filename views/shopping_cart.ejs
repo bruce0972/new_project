@@ -21,28 +21,64 @@
             </thead>
             <tbody>
                 <% for(let i = 0; i < productId.length; i++){ %>
-                <tr>
-                    <td style="display: none"><%= productId[i] %></td>
+                <tr class="items">
+                    <td class="product_id" style="display: none"><%= productId[i] %></td>
                     <td class="product_name"><%= productName[i] %></td>
-                    <td><%= productQty[i] %></td>
+                    <td class="product_qty"><%= productQty[i] %></td>
                     <td><span>$ </span><%= productUnitPrice[i] %></td>
-                    <td><span>$ </span><%= productQty[i] * productUnitPrice[i] %></td>
-                    <!-- <td><a class="cancle_link" href="javascript:hi()"><i class="fas fa-trash-alt"></i></a></td> -->
-                    <td><button class="cancle_btn"  onclick="delete_one()"><i class="fas fa-trash-alt"></i></button></td>
+                    <td><span>$ </span><span class="item-subtotal"><%= productQty[i] * productUnitPrice[i] %></span>
+                    </td>
+                    <td><button class="cancle_btn" onclick="delete_one()"><i class="fas fa-trash-alt"></i></button></td>
                 </tr>
                 <% } %>
-                
+                <tr>
+                    <td colspan="3">小計</td>
+                    <td colspan="1"><span>$ </span><span id="subtotal"></span></td>
+                    <td></td>
+                </tr>
+
             </tbody>
         </table>
+        <form action="/order" method="POST" class="text-right">
+            <input type="text" name="order_item_id" id="order_item_id" style="display: none">
+            <input type="text" name="order_item_qty" id="order_item_qty" style="display: none">
+            <button type="submit" class="btn btn-primary" onclick="placeOrder()">確認下單</button>
+        </form>
+
     </div>
 
     <script>
-            $('button.cancle_btn').click(function () {
-                let selected_product_name = $(this).parent().siblings('td').eq(1).text();
-                if (confirm(`是否要取消"${selected_product_name}"的資料?`)) {
-                    $(this).parent().parent().remove();
-                }
-            })
+        var shopping_cart_subtotal = 0;
+
+
+        $(document).ready(function () {
+            for (let i = 0; i < $('span.item-subtotal').length; i++) {
+                shopping_cart_subtotal += parseInt($('span.item-subtotal').eq(i).text()); //網頁載入後先算小計
+            }
+            $('#subtotal').text(shopping_cart_subtotal);
+        });
+
+        $('button.cancle_btn').click(function () {
+            let selected_product_name = $(this).parent().siblings('td').eq(1).text();
+            if (confirm(`是否要取消"${selected_product_name}"的資料?`)) {
+                $(this).parent().parent().remove();
+            }
+            shopping_cart_subtotal -= parseInt($(this).parent().siblings('td').eq(4).children('span.item-subtotal').text()); //小計扣除刪除的項目金額
+            $('#subtotal').text(shopping_cart_subtotal);
+        })
+
+        function placeOrder() {
+            let productId_toNode = [];
+            let productQty_toNode = [];
+
+            for (let i = 0; i < $('tr.items').length; i++) {
+                productId_toNode.push($('tr.items').eq(i).children('td.product_id').text()); //等等從這裡開始
+                productQty_toNode.push($('tr.items').eq(i).children('td.product_qty').text());
+            }
+
+            $('#order_item_id').val(productId_toNode);
+            $('#order_item_qty').val(productQty_toNode);
+        }
     </script>
 
 </body>

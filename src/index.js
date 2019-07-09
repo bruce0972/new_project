@@ -134,7 +134,7 @@ app.post('/member_info', (req, res) => {
 
 });
 
-//
+//轉入shopping_cart頁面
 app.post('/shopping_cart', (req, res) => {
     // console.log("進入shopping_cart --- post");
     let productId = req.body.shopping_cart_id.split(",");
@@ -150,6 +150,21 @@ app.post('/shopping_cart', (req, res) => {
     data.productUnitPrice = productUnitPrice;
     
     res.render('shopping_cart', data);
+});
+
+app.post('/order', (req, res) => {
+    let productId = req.body.order_item_id.split(',');
+    let productQty = req.body.order_item_qty.split(',');
+
+    for(let i = 0; i < req.body.order_item_id.length ; i++){
+        let sql_Updata = `UPDATE product SET product.quantity = product.quantity - ${productQty[i]} WHERE product.id = ${productId[i]};`;
+        db.queryAsync(sql_Updata, function(error, results){
+            console.log("扣帳成功");
+        })
+    }
+
+    let sql_Insert = `INSERT INTO order_list`
+    
 });
 
 //無相對路徑時捕捉的middleware
