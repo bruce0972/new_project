@@ -127,7 +127,6 @@ app.post('/member_info', (req, res) => {
             }
         })
         .then(results => {
-            // console.log(results);
             res.locals.revInfo = true;
             console.log(results[0]);
             res.render('member_info', results[0]);
@@ -137,11 +136,11 @@ app.post('/member_info', (req, res) => {
 
 //轉入shopping_cart頁面
 app.post('/shopping_cart', (req, res) => {
-    // console.log("進入shopping_cart --- post");
     let productId = req.body.shopping_cart_id.split(",");
     let productName = req.body.shopping_cart_name.split(",");
     let productQty = req.body.shopping_cart_qty.split(",");
     let productUnitPrice = req.body.shopping_cart_unit_price.split(",")
+    let productCategory = req.body.shopping_cart_category.split(",")
 
     let data = {};
 
@@ -149,6 +148,7 @@ app.post('/shopping_cart', (req, res) => {
     data.productName = productName;
     data.productQty = productQty;
     data.productUnitPrice = productUnitPrice;
+    data.productCategory = productCategory;
 
     res.render('shopping_cart', data);
 });
@@ -199,7 +199,7 @@ app.post('/place_order', (req, res) => {
                 })
                 .then(results => {
                     new_order.orderInfo = results
-                    console.log(new_order);
+                    // console.log(new_order);
                     res.render('order_info', new_order);
                 })
         })

@@ -15,11 +15,12 @@
         <div class="row">
             <div class="col-3">
                 <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                    <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab"
-                        aria-controls="v-pills-home" aria-selected="true">總類</a>
+                    <a class="nav-link active all_category" id="v-pills-home-tab" data-toggle="pill"
+                        href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">總類</a>
                     <% for(let category of non_repeat_category){ %>
-                    <a class="nav-link category_link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab"
-                        aria-controls="v-pills-profile" aria-selected="false"><%= category %></a>
+                    <a class="nav-link category_link" id="v-pills-profile-tab" data-toggle="pill"
+                        href="#v-pills-profile" role="tab" aria-controls="v-pills-profile"
+                        aria-selected="false"><%= category %></a>
                     <% } %>
                 </div>
             </div>
@@ -34,6 +35,7 @@
                             <div class="card-body">
                                 <h5 class="card-title"><%= products[i].name %></h5>
                                 <p class="card-text"><%= products[i].description %></p>
+                                <span class="product_category" style="display: none"><%= products[i].category %></span>
                                 <span>網路價$ </span>
                                 <span><%= products[i].price %> </span><button id="<%= products[i].id %>"
                                     name="<%= products[i].id %>" class="btn btn-primary btn-sm btn-purchase">購買</button>
@@ -53,7 +55,7 @@
         var productName;
         var productUnitPrice = 0;
         var productQty = 0;
-        // var productPrice = 0;
+        var productCategory = "";
         var item_qty = 0;
         var item_amount = 0;
         var shopping_cart = new Map(); //僅供首頁購物車顯示金額而已
@@ -61,7 +63,8 @@
         var shopping_cart_name_list = [];
         var shopping_cart_qty_list = []; //傳送後台的qty清單
         var shopping_cart_unit_price_list = [];
-        
+        var shopping_cart_category = [];
+
 
         $('button.btn-purchase').click(function () {
             btnId = this.id - 1; //按鈕編號
@@ -69,6 +72,7 @@
             productQty = 1; //之後再改動態
             productUnitPrice = parseInt($('.card-product').eq(btnId).find('span').last().text()); //商品單價
             productName = $('.card-product').eq(btnId).find('h5').text();
+            productCategory = $('.product_category').eq(btnId).text();
 
 
             if (!shopping_cart.has(productId)) {
@@ -82,27 +86,30 @@
                 shopping_cart_name_list.push(productName);
                 shopping_cart_qty_list.push(productQty);
                 shopping_cart_unit_price_list.push(productUnitPrice);
+                shopping_cart_category.push(productCategory);
             }
 
             $('#shopping_cart_id').val(shopping_cart_id_list);
             $('#shopping_cart_name').val(shopping_cart_name_list);
             $('#shopping_cart_qty').val(shopping_cart_qty_list);
             $('#shopping_cart_unit_price').val(shopping_cart_unit_price_list);
+            $('#shopping_cart_category').val(shopping_cart_category);
         })
 
-        $('a.category_link').click(function(){
+        $('a.category_link').click(function () {
             let category = $(this).text();
             let product_number = $('div.card_container').children().length;
-            // $('div.card_container').children().hide();
-            // for(let i = 0; i < product_number; i++){
-            //     if($('div.card-container')[i].children('h5.card-title').text()=="樂事波樂洋芋片"){
-            //         $('div.card_container').show()
-            //     }
-            // }
-            // console.log($('div.card-container').eq(0).children('h5.card-title').eq(0).text())
-            console.log($('div.card_container').eq(0).children('h5.card-title').text())
-            // $('h5.card-title').eq(0).text();
+            $('div.card_container').children().hide();
+            $('span.product_category').eq(7).text();
+            for (let i = 0; i < product_number; i++) {
+                if ($('span.product_category').eq(i).text() == category) {
+                    $('span.product_category').eq(i).parents('div.card-product').show();
+                }
+            }
+        })
 
+        $('a.all_category').click(function () {
+            $('div.card_container').children().show();
         })
     </script>
 </body>
