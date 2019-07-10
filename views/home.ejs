@@ -14,7 +14,7 @@
         <% } %>
         <div class="row">
             <div class="col-3">
-                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <div class="nav flex-column nav-pills test" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                     <a class="nav-link active all_category" id="v-pills-home-tab" data-toggle="pill"
                         href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">總類</a>
                     <% for(let category of non_repeat_category){ %>
@@ -47,6 +47,8 @@
                 <% } %>
             </div>
         </div>
+        <span id="check_category" style="display: none"
+            onchange="toCategory()"><% if(temp_category){ %><%= temp_category %><% }else{ %>總類<% } %></span>
     </div>
 
     <script>
@@ -90,6 +92,7 @@
                     shopping_cart_qty_list.push(productQty);
                     shopping_cart_unit_price_list.push(productUnitPrice);
                     shopping_cart_category.push(productCategory);
+
                 }
 
                 $('#shopping_cart_id').val(shopping_cart_id_list);
@@ -97,13 +100,13 @@
                 $('#shopping_cart_qty').val(shopping_cart_qty_list);
                 $('#shopping_cart_unit_price').val(shopping_cart_unit_price_list);
                 $('#shopping_cart_category').val(shopping_cart_category);
+                $('#temp_category').val(productCategory); //暫存前一個種類
+
+
 
                 $.post('/addToCart', $(document.forms[0]).serialize(), function (data) {
-                    let cart_amount = SumDataforEach(data.body.shopping_cart_unit_price.split(','))
-                    $('#shopping_cart_amount').text(cart_amount);
-
+                    location.reload();
                 });
-                $('#shopping_cart_amount').text(0);
 
             } else {
                 $('#login_btn').click();
@@ -134,6 +137,26 @@
             return sum;
         };
 
+        $(document).ready(
+            function toCategory() {
+                let t = $('#check_category').text();
+                switch (t) {
+                    case "食品":
+                        $('#v-pills-tab').children().eq(1).click();
+                        break;
+                    case "玩具":
+                        $('#v-pills-tab').children().eq(2).click();
+                        break;
+                    case "3C":
+                        $('#v-pills-tab').children().eq(3).click();
+                        break;
+                    case "文具":
+                        $('#v-pills-tab').children().eq(4).click();
+                        break;
+                    default:
+                        $('#v-pills-tab').children().eq(0).click();
+                }
+            })
     </script>
 </body>
 

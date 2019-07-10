@@ -19,16 +19,16 @@
                 </tr>
             </thead>
             <tbody>
-                <% for(let i = 0; i < productId.length; i++){ %>
+                <% for(let i = 0; i < form.length; i++){ %>
                 <tr class="items">
-                    <td class="product_id" style="display: none"><%= productId[i] %></td>
-                    <td class="product_name"><%= productName[i] %></td>
-                    <td class="product_qty"><%= productQty[i] %></td>
-                    <td><span>$ </span><%= productUnitPrice[i] %></td>
-                    <td><span>$ </span><span class="product_subtotal"><%= productQty[i] * productUnitPrice[i] %></span>
+                    <td class="product_id" style="display: none"><%= form[i].shopping_cart_id %></td>
+                    <td class="product_name"><%= form[i].shopping_cart_name %></td>
+                    <td class="product_qty"><%= form[i].shopping_cart_qty %></td>
+                    <td><span>$ </span><%= form[i].shopping_cart_unit_price %></td>
+                    <td><span>$ </span><span class="product_subtotal"><%= form[i].shopping_cart_qty * form[i].shopping_cart_unit_price %></span>
                     </td>
                     <td><button class="cancle_btn" ><i class="fas fa-trash-alt"></i></button></td>
-                    <!-- <td class="product_category"><%= productCategory[i] %></td>  -->
+                    <!-- <td class="product_category"><%# productCategory[i] %></td>  -->
                 </tr>
                 <% } %>
                 <tr>
@@ -62,7 +62,7 @@
 
         $('button.cancle_btn').click(function () {
             let selected_product_name = $(this).parent().siblings('td').eq(1).text();
-            if (confirm(`是否要取消"${selected_product_name}"的資料?`)) {
+            if (confirm(`是否要取消商品"${selected_product_name}"?`)) {
                 $(this).parent().parent().remove();
             }
             shopping_cart_subtotal -= parseInt($(this).parent().siblings('td').eq(4).children('span.product_subtotal').text()); //小計扣除刪除的項目金額

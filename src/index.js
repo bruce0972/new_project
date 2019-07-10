@@ -37,9 +37,15 @@ app.use('/', (req, res, next) => {
     }
     next();
 });
-
+app.use('/', (req, res , next)=>{
+    if (!req.session.loginEmail){
+        delete req.session.subtotal;
+    }
+    next();
+});
 //首頁
 app.get('/', (req, res) => {
+    console.log(req.session.temp_category);
     let data = {};
     data.non_repeat_category = new Set();
     let sql = "SELECT * FROM product;";
@@ -62,6 +68,27 @@ app.get('/', (req, res) => {
         data.isLogined = !!req.session.loginEmail;
         data.loginEmail = req.session.loginEmail;
         data.loginName = req.session.loginName;
+        // console.log('2.req.session.shopping_cart_temp_amount ',req.session.shopping_cart_temp_amount);
+        // if (!req.session.shopping_cart_temp_amount == undefined) {
+        //     subarr.push(req.session.shopping_cart_temp_amount);
+        //     console.log('3.subarr ',subarr);
+        //     data.subtotal = SumDataforEach(subarr);
+        //     console.log('4.data.subtotal',data.subtotal);
+        // } else {
+            
+        // }
+        data.subtotal = req.session.subtotal;
+        // console.log(req.session.form.temp_category);
+        data.temp_category = req.session.temp_category;
+        
+        
+        
+        
+        if(!data.loginEmail){
+            delete req.session.shopping_cart_temp_amount
+        }
+
+        // console.log(req.session.shopping_cart_temp_amount)
         res.render('home', data);
     })
 });
@@ -90,6 +117,7 @@ app.post('/', (req, res) => {
 app.get('/logout', (req, res) => {
     delete req.session.loginEmail;
     delete req.session.loginName;
+    delete req.session.subtotal;
     res.redirect('/');
 });
 
@@ -119,6 +147,7 @@ app.get('/member_info', (req, res) => {
     if (!!req.session.loginEmail === true) {
         db.queryAsync('SELECT * FROM member WHERE email = ?', req.session.loginEmail)
             .then(results => {
+                results[0].subtotal = req.session.subtotal;
                 res.render('member_info', results[0]);
             })
     };
@@ -135,47 +164,39 @@ app.post('/member_info', (req, res) => {
         })
         .then(results => {
             res.locals.revInfo = true;
-            console.log(results[0]);
+            // console.log(results[0]);
+            results[0].subtotal = req.session.subtotal;
             res.render('member_info', results[0]);
         });
 
 });
 
-app.post('/addToCart', (req, res) => {
-    let data = {};
-    data.body = req.body;
+var arr = [];
+var itemarr = [];
 
-    req.session.shopping_cart_temp_amount = SumDataforEach(req.body.shopping_cart_unit_price.split(','));
-    res.json(data)
+app.post('/addToCart', (req, res) => {
+    
+    
+    itemarr.push(req.body);
+    
+    req.session.form = itemarr;
+    req.session.temp_category = req.body.temp_category;
+
+
+    arr.push(req.body.shopping_cart_unit_price);
+    // req.session.shopping_cart_unit_price = req.body.shopping_cart_unit_price;
+    req.session.subtotal= SumDataforEach(arr);
+    res.redirect('/');
+    
 })
 
 //轉入shopping_cart頁面
 app.post('/shopping_cart', (req, res) => {
-    let productId = req.body.shopping_cart_id.split(",");
-    let productName = req.body.shopping_cart_name.split(",");
-    let productQty = req.body.shopping_cart_qty.split(",");
-    let productUnitPrice = req.body.shopping_cart_unit_price.split(",");
-    let productCategory = req.body.shopping_cart_category.split(",");
-    let cart_temp_amount = req.body.shopping_cart_temp_amount;
-    console.log("cart amount");
-    console.log(req.body.shopping_cart_temp_amount);
-
     let data = {};
-
-    data.productId = productId;
-    data.productName = productName;
-    data.productQty = productQty;
-    data.productUnitPrice = productUnitPrice;
-    data.productCategory = productCategory;
-    data.cart_temp_amount = cart_temp_amount;
-
-    // req.session.shopping_cart_id = productId;
-    // req.session.shopping_cart_name = productName;
-    // req.session.shopping_cart_qty = productQty;
-    // req.session.shopping_cart_unit_price = productUnitPrice;
-    req.session.cart_temp_amount = cart_temp_amount; //測試
     
-
+    data.form = req.session.form;
+    data.subtotal = req.session.subtotal;
+    // res.json(data);
     res.render('shopping_cart', data);
 });
 
@@ -184,7 +205,7 @@ app.get('/order_info', (req, res) => {
     let sql = `SELECT * FROM order_list WHERE member_id = ${req.session.member_id}`;
     db.queryAsync(sql, (error, results) => {
         order_Info.orderInfo = results;
-        // console.log(order_Info);
+        order_Info.subtotal = req.session.subtotal;
         res.render('order_info', order_Info);
     })
 });
@@ -194,7 +215,7 @@ app.post('/place_order', (req, res) => {
     let productQty = req.body.order_item_qty.split(',');
     let productSubtotal = req.body.order_item_subtotal.split(',');
     let productName = req.body.order_item_name.split(',');
-    let temp_max_order_id = 0;
+    var temp_max_order_id = 0;
     let new_order = {};
 
     if (!req.session.loginEmail) {
@@ -211,7 +232,7 @@ app.post('/place_order', (req, res) => {
     let sql_Select = `SELECT order_id from order_list ORDER BY order_id DESC LIMIT 1;`;
     db.queryAsync(sql_Select)
         .then(results => {
-            temp_max_order_id = results[0].order_id + 1;
+            results.length == 0 ? temp_max_order_id = 1 : temp_max_order_id = results[0].order_id + 1;
             return db.queryAsync(`SELECT * FROM member where email = ?`, [req.session.loginEmail])
                 .then(results => {
                     // new_order.memberid = results[0].member_id;
@@ -220,13 +241,20 @@ app.post('/place_order', (req, res) => {
                     for (let i = 0; i < productId.length; i++) {
                         db.queryAsync(sql_Insert, [temp_max_order_id, results[0].member_id, productId[i], productName[i], productQty[i], productSubtotal[i], onTime()])
                     }
-                    let sql_Select_orderlist = `SELECT * FROM order_list WHERE member_id = ${results[0].member_id};`;
+                    let sql_Select_orderlist = `SELECT * FROM order_list WHERE member_id = ${results[0].member_id} AND order_id = ${temp_max_order_id};`;
                     return db.queryAsync(sql_Select_orderlist)
                 })
                 .then(results => {
-                    new_order.orderInfo = results
-                    // console.log(new_order);
-                    res.render('order_info', new_order);
+                    new_order.orderInfo = results;
+                    delete req.session.subtotal; //清空購物車
+                    // delete req.session.form;
+                    // delete req.session.subtotal;
+                    new_order.subtotal = req.session.subtotal;
+                    arr = [];
+                    itemarr = [];
+                    // new_order.subtotal = 0;
+                    // console.log(req.session)
+                    res.render('order_complete', new_order);
                 })
         })
 
