@@ -268,7 +268,7 @@ app.use((req, res) => {
     res.send('404 - 找不到網頁');
 });
 
-app.listen(5000, (req, res) => {
+app.listen(3000, (req, res) => {
     console.log("Server running");
 });
 
