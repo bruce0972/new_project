@@ -45,7 +45,7 @@ app.use('/', (req, res , next)=>{
 });
 //首頁
 app.get('/', (req, res) => {
-    console.log(req.session.temp_category);
+    // console.log(req.session.temp_category);
     let data = {};
     data.non_repeat_category = new Set();
     let sql = "SELECT * FROM product;";
